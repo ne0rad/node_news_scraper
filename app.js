@@ -13,6 +13,15 @@ async function scrape(url) {
     timeout: 0
   });
   const page = await browser.newPage();
+  await page.setRequestInterception(true);
+  page.on('request', (request) => {
+    if (['image', 'stylesheet', 'font', 'script'].indexOf(request.resourceType()) !== -1) {
+      request.abort();
+    } else {
+      request.continue();
+    }
+  });
+
   await page.goto(url);
 
   const titles = await page.$$eval('.gs-c-promo-heading__title', els => els.map(el => el.innerText));
@@ -22,12 +31,10 @@ async function scrape(url) {
   const articles = [];
 
   for (let i = 0; i < descriptions.length; i++) {
-    const newPage = await browser.newPage();
-    await newPage.goto(urls[i]);
-    const allArticles = await newPage.$$eval('[data-component="text-block"]', els => els.map(el => el.innerText));
+    await page.goto(urls[i]);
+    const allArticles = await page.$$eval('[data-component="text-block"]', els => els.map(el => el.innerText));
     const article = allArticles.join('\n\n');
     articles.push(article);
-    await newPage.close();
   }
 
   const data = [];

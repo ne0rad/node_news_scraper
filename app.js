@@ -6,24 +6,7 @@ const puppeteer = require('puppeteer');
 
 app.use(morgan('dev'));
 
-const cache = {
-  technology: {
-    data: null,
-    lastUpdated: null
-  },
-  business: {
-    data: null,
-    lastUpdated: null
-  },
-  science: {
-    data: null,
-    lastUpdated: null
-  },
-  climate: {
-    data: null,
-    lastUpdated: null
-  }
-};
+const cache = {};
 
 const categories = {
   technology: 'https://www.bbc.co.uk/news/technology',
@@ -36,8 +19,7 @@ async function scrape(url) {
   try {
     const browser = await puppeteer.launch({
       headless: true,
-      args: ['--no-sandbox'],
-      timeout: 0
+      args: ['--no-sandbox']
     });
     const page = await browser.newPage();
     await page.setRequestInterception(true);
@@ -99,6 +81,11 @@ async function getData(category) {
 }
 
 for (const [category] of Object.entries(categories)) {
+
+  cache[category] = {
+    data: null,
+    lastUpdated: null
+  }
 
   app.get(`/${category}`, async (req, res) => {
     const data = await getData(category);

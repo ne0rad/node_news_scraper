@@ -69,11 +69,6 @@ app.get('/science', async (req, res) => {
   res.json(result)
 })
 
-app.get('/politics', async (req, res) => {
-  const result = await scrape('https://www.bbc.co.uk/news/politics');
-  res.json(result)
-})
-
 app.get('/business', async (req, res) => {
   const result = await scrape('https://www.bbc.co.uk/news/business');
   res.json(result)

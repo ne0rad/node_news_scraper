@@ -73,7 +73,10 @@ async function getData(category) {
   const timeDiffInMinutes = timeDiff / 1000 / 60;
 
   if (timeDiffInMinutes > 30) {
+
     const result = await scrape(categories[category]);
+    if (result.error) return { error: result.error };
+    
     cache[category].data = result.data;
     cache[category].lastUpdated = now;
   }

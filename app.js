@@ -12,7 +12,8 @@ const categories = {
   technology: 'https://www.bbc.co.uk/news/technology',
   business: 'https://www.bbc.co.uk/news/business',
   science: 'https://www.bbc.co.uk/news/science_and_environment',
-  climate: 'https://www.bbc.co.uk/news/science-environment-56837908'
+  climate: 'https://www.bbc.co.uk/news/science-environment-56837908',
+  entertainment: 'https://www.bbc.co.uk/news/entertainment_and_arts'
 };
 
 async function scrape(url) {

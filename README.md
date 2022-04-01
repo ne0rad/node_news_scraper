@@ -47,3 +47,5 @@ Currently available categories for GET requests:
 `/business`
 
 `/climate`
+
+`/entertainment`

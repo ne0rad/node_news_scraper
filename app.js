@@ -29,6 +29,12 @@ async function scrape(url) {
   const urls = await page.$$eval('.gs-c-promo-heading', els => els.map(el => el.href));
   const descriptions = await page.$$eval('.gs-c-promo-summary', els => els.map(el => el.innerText));
 
+  if(titles.length === 0 || urls.length === 0 || descriptions.length === 0) {
+    return {
+      error: 'No results found'
+    }
+  }
+
   const articles = [];
 
   for (let i = 0; i < descriptions.length; i++) {

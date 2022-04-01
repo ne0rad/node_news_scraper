@@ -44,8 +44,6 @@ Currently available categories for GET requests:
 
 `/science`
 
-`/politics`
-
 `/business`
 
 `/climate`

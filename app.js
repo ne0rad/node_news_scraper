@@ -6,6 +6,31 @@ const puppeteer = require('puppeteer');
 
 app.use(morgan('dev'));
 
+const cache = {
+  technology: {
+    data: null,
+    lastUpdated: null
+  },
+  business: {
+    data: null,
+    lastUpdated: null
+  },
+  science: {
+    data: null,
+    lastUpdated: null
+  },
+  climate: {
+    data: null,
+    lastUpdated: null
+  }
+};
+
+const categories = {
+  technology: 'https://www.bbc.co.uk/news/technology',
+  business: 'https://www.bbc.co.uk/news/business',
+  science: 'https://www.bbc.co.uk/news/science_and_environment',
+  climate: 'https://www.bbc.co.uk/news/science-environment-56837908'
+};
 
 async function scrape(url) {
   try {
@@ -58,25 +83,40 @@ async function scrape(url) {
   }
 }
 
+async function getData(category) {
+  const now = new Date();
+  const lastUpdated = cache[category].lastUpdated;
+  const timeDiff = now - lastUpdated;
+  const timeDiffInMinutes = timeDiff / 1000 / 60;
+
+  if (timeDiffInMinutes > 30) {
+    const result = await scrape(categories[category]);
+    cache[category].data = result.data;
+    cache[category].lastUpdated = now;
+  }
+
+  return cache[category].data;
+}
+
 
 app.get('/technology', async (req, res) => {
-  const result = await scrape('https://www.bbc.co.uk/news/technology');
-  res.json(result)
+  const data = await getData('technology');
+  res.send(data);
 })
 
 app.get('/science', async (req, res) => {
-  const result = await scrape('https://www.bbc.co.uk/news/science_and_environment');
-  res.json(result)
+  const data = await getData('science');
+  res.send(data);
 })
 
 app.get('/business', async (req, res) => {
-  const result = await scrape('https://www.bbc.co.uk/news/business');
-  res.json(result)
+  const data = await getData('business');
+  res.send(data);
 })
 
 app.get('/climate', async (req, res) => {
-  const result = await scrape('https://www.bbc.co.uk/news/science-environment-56837908');
-  res.json(result)
+  const data = await getData('climate');
+  res.send(data);
 })
 
 

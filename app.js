@@ -8,56 +8,54 @@ app.use(morgan('dev'));
 
 
 async function scrape(url) {
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox'],
-    timeout: 0
-  });
-  const page = await browser.newPage();
-  await page.setRequestInterception(true);
-  page.on('request', (request) => {
-    if (['image', 'stylesheet', 'font', 'script'].indexOf(request.resourceType()) !== -1) {
-      request.abort();
-    } else {
-      request.continue();
+  try {
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox'],
+      timeout: 0
+    });
+    const page = await browser.newPage();
+    await page.setRequestInterception(true);
+    page.on('request', (request) => {
+      if (['image', 'stylesheet', 'font', 'script'].indexOf(request.resourceType()) !== -1) {
+        request.abort();
+      } else {
+        request.continue();
+      }
+    });
+
+    await page.goto(url);
+
+    const titles = await page.$$eval('.gs-c-promo-heading__title', els => els.map(el => el.innerText));
+    const urls = await page.$$eval('.gs-c-promo-heading', els => els.map(el => el.href));
+    const descriptions = await page.$$eval('.gs-c-promo-summary', els => els.map(el => el.innerText));
+
+    const articles = [];
+
+    for (let i = 0; i < descriptions.length; i++) {
+      await page.goto(urls[i]);
+      const allArticles = await page.$$eval('[data-component="text-block"]', els => els.map(el => el.innerText));
+      const article = allArticles.join('\n\n');
+      articles.push(article);
     }
-  });
 
-  await page.goto(url);
+    const data = [];
 
-  const titles = await page.$$eval('.gs-c-promo-heading__title', els => els.map(el => el.innerText));
-  const urls = await page.$$eval('.gs-c-promo-heading', els => els.map(el => el.href));
-  const descriptions = await page.$$eval('.gs-c-promo-summary', els => els.map(el => el.innerText));
+    descriptions.forEach((el, i) => {
+      data.push({
+        id: i,
+        title: titles[i],
+        description: el,
+        url: urls[i],
+        article: articles[i]
+      })
+    });
 
-  if(titles.length === 0 || urls.length === 0 || descriptions.length === 0) {
-    return {
-      error: 'No results found'
-    }
+    await browser.close();
+    return { data };
+  } catch (err) {
+    return { error: err };
   }
-
-  const articles = [];
-
-  for (let i = 0; i < descriptions.length; i++) {
-    await page.goto(urls[i]);
-    const allArticles = await page.$$eval('[data-component="text-block"]', els => els.map(el => el.innerText));
-    const article = allArticles.join('\n\n');
-    articles.push(article);
-  }
-
-  const data = [];
-
-  descriptions.forEach((el, i) => {
-    data.push({
-      id: i,
-      title: titles[i],
-      description: el,
-      url: urls[i],
-      article: articles[i]
-    })
-  });
-
-  await browser.close();
-  return { data };
 }
 
 

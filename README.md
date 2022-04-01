@@ -11,7 +11,7 @@ Keep in mind that request times depend on the internet connection of the machine
 
 #### Request to get top technology news form BBC
 
-```http
+```API
   GET http://localhost:8000/technology
 ```
 Returns JSON document with top technology news from BBC.

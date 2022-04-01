@@ -9,6 +9,7 @@ app.use(morgan('dev'));
 
 async function scrape(url) {
   const browser = await puppeteer.launch({
+    headless: true,
     args: ['--no-sandbox'],
     timeout: 0
   });

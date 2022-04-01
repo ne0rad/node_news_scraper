@@ -98,27 +98,14 @@ async function getData(category) {
   return cache[category].data;
 }
 
+for (const [category] of Object.entries(categories)) {
 
-app.get('/technology', async (req, res) => {
-  const data = await getData('technology');
-  res.send(data);
-})
+  app.get(`/${category}`, async (req, res) => {
+    const data = await getData(category);
+    res.send(data);
+  });
 
-app.get('/science', async (req, res) => {
-  const data = await getData('science');
-  res.send(data);
-})
-
-app.get('/business', async (req, res) => {
-  const data = await getData('business');
-  res.send(data);
-})
-
-app.get('/climate', async (req, res) => {
-  const data = await getData('climate');
-  res.send(data);
-})
-
+}
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}`)
